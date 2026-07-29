@@ -1,27 +1,19 @@
 ---
 license: apache-2.0
+language:
+- en
+library_name: transformers
+pipeline_tag: text-generation
+spaces:
+- Harikrish2727/BetterGPT-demo
 datasets:
 - HuggingFaceFW/fineweb-edu
 - HuggingFaceTB/finemath
 - bigcode/starcoderdata
 - HuggingFaceTB/cosmopedia
-language:
-- en
 metrics:
+- accuracy
 - perplexity
-pipeline_tag: text-generation
-base_model:
-- Harikrish2727/BetterGPT-150M
-tags:
-- text-generation-inference
----
----
-license: apache-2.0
-language:
-- en
-library_name: transformers
-pipeline_tag: text-generation
-
 tags:
 - pytorch
 - transformers
@@ -30,8 +22,9 @@ tags:
 - small-language-model
 - pretrained
 - from-scratch
+base_model:
+- Harikrish2727/BetterGPT-150M
 ---
-
 # BetterGPT-150M
 
 BetterGPT-150M is a **150 million parameter decoder-only Transformer** language model pretrained from scratch using PyTorch.
@@ -40,7 +33,15 @@ It is a **base language model** and has **not** been instruction tuned. The mode
 
 BetterGPT is developed as an end-to-end engineering project that implements the complete lifecycle of building a modern small language model, including tokenizer training, dataset preparation, large-scale pretraining, and Hugging Face Transformers integration.
 
+Despite training on just ~15B tokens, BetterGPT-150M outperforms several established ~110–160M parameter baselines (GPT-2 Small, OPT-125M, Pythia-160M) on science-reasoning benchmarks like ARC — see [Evaluation](#evaluation) for full results.
+
+## 🚀 Live Demo
+
+You can try out **BetterGPT-150M** directly in your browser:
+👉 [**Try the Interactive Space Demo**](https://huggingface.co/spaces/Harikrish2727/BetterGPT-Demo)
+
 ---
+# [Repo](https://github.com/harikrish2727/BetterGPT)
 
 # Model Details
 
@@ -61,7 +62,49 @@ BetterGPT is developed as an end-to-end engineering project that implements the 
 | Framework | PyTorch |
 | Library | Hugging Face Transformers |
 
----
+# Evaluation
+
+BetterGPT-150M was evaluated zero-shot (0-shot) on standard academic benchmarks using `lm-evaluation-harness`. Notably, on ARC-Easy and ARC-Challenge, BetterGPT-150M outperforms GPT-2 Small, OPT-125M, Pythia-160M, and Cerebras-GPT-111M despite being trained on roughly 15B tokens — a fraction of the 40B–300B+ tokens used for those baselines — suggesting the FineMath/Cosmopedia-heavy data mix is particularly effective for science-reasoning-style tasks relative to raw token count. Results are grouped by capability; `acc_norm` is reported where answer options vary in length (this corrects for a length bias in raw log-likelihood scoring — see [lm-eval-harness docs](https://github.com/EleutherAI/lm-evaluation-harness) for details).
+
+### Commonsense & Physical Reasoning
+
+| Benchmark | Metric | Score |
+|---|---|---|
+| PIQA | acc | 64.58% |
+| WinoGrande | acc | 52.41% |
+| HellaSwag | acc_norm | 36.46% |
+
+### Knowledge & Science Reasoning
+
+| Benchmark | Metric | Score |
+|---|---|---|
+| SciQ | acc | 80.70% |
+| ARC-Easy | acc_norm | 48.27% |
+| ARC-Challenge | acc_norm | 27.30% |
+| OpenBookQA | acc_norm | 31.60% |
+
+### Language Modeling Quality
+
+| Benchmark | Metric | Score |
+|---|---|---|
+| LAMBADA (OpenAI) | acc | 27.79% |
+| LAMBADA (OpenAI) | perplexity | 70.88 |
+
+### Math & Logical Reasoning
+
+*In progress — MathQA and LogiQA results will be added once complete.*
+
+### Baseline Comparison (~110–160M Parameter Scale)
+
+| Model | Params | ARC-E | ARC-C | HellaSwag | PIQA | WinoGrande | SciQ |
+|---|---|---|---|---|---|---|---|
+| **BetterGPT-150M (ours)** | 150M | **48.27** | **27.30** | **36.46** | **64.58** | **52.41** | **80.70** |
+| GPT-2 Small | 124M | 39.7 | 22.6 | 31.4 | 62.1 | 50.7 | — |
+| OPT-125M | 125M | 39.9 | 22.1 | 31.6 | 62.0 | 51.8 | — |
+| Pythia-160M | 160M | 36.4–46.3* | 23.1 | 30.3 | 59.8–62.5* | 50.8–51.2 | 76.4 |
+| Cerebras-GPT-111M | 111M | 35.1 | 21.0 | 27.2 | 58.1 | 49.0 | — |
+
+*Baseline figures are drawn from published papers/reproductions using varying `lm-eval-harness` versions, which can introduce small discrepancies (ranges shown reflect this). BetterGPT-150M's own figures above are from a single consistent run.*
 
 # Training
 
